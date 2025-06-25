@@ -2,3 +2,6 @@
 *dist
 
 *.env
+/src/generated/prisma
+./.gitignore
+./futurePlans.txt
