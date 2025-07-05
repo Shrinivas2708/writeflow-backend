@@ -6,9 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate": "prisma generate",
-    "build": "npx tsc -b && npm run copy-env ",
-    "copy-env": "copy .env.example dist/env.example ",
-    "dev": " npm run build && node dist/index.js",
+     "copy-env": "shx cp .env.example dist/env.example",
+    "build": "npx tsc -b && npm run copy-env",
+    "dev": "npm run build && node dist/index.js",
     "start": "node dist/index.js"
   },
   "keywords": [],
@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "prisma": "^6.10.1",
+    "shx": "^0.4.0",
     "tsx": "^4.20.3"
   }
 }
