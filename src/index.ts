@@ -1,6 +1,6 @@
 import { validateEnv } from "./utils/validateEnv";
 require("dotenv").config();
-validateEnv();
+// validateEnv();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -10,6 +10,7 @@ import authRoutes from "./routes/auth.routes";
 
 import chalk from "chalk";
 import { resendWebhookHandler } from "./controller/webhooks.controller";
+import { cleanupHandler } from "./controller/cleanup.controller";
 
 export const prisma = new PrismaClient();
 const app = express();
@@ -24,7 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/v1/auth", authRoutes);
 app.post("/api/webhooks/resend", resendWebhookHandler);
-
+app.delete("/api/cron/cleanup",cleanupHandler)
 app.use(globalErrorHandler);
 
 app.listen(PORT, () => {

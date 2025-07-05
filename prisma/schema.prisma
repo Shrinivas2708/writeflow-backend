@@ -52,7 +52,11 @@ enum EmailStatus {
   VERIFIED
   INVALID
 }
-
+model InvalidEmail {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
 model Blog {
   id             String                  @id @default(uuid())
   title          String

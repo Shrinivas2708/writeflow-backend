@@ -326,6 +326,12 @@ export const resendVerificationEmail = async (
     });
     return;
   }
+  if ( user?.emailStatus === "INVALID") {
+    res.status(409).json({
+      message: "Email is invalid!",
+    });
+    return;
+  }
   const now = new Date();
   const lastSent = user?.lastEmailSentAt ?? new Date(0);
   const minutesSinceLastSend = (now.getTime() - lastSent.getTime()) / 60000;
