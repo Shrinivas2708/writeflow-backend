@@ -1,12 +1,8 @@
 import jwt from "jsonwebtoken";
 
-export const generateAccessToken = (user: { id: string; name?: string; isAdmin?: boolean }) => {
+export const generateAccessToken = (userId: string) => {
   return jwt.sign(
-    {
-      id: user.id,
-      name: user.name,
-      isAdmin: user.isAdmin,
-    },
+    {id:userId},
     process.env.JWT_SECRET_ACCESSTOKEN!,
     { expiresIn:  "15m" } 
   );
@@ -15,15 +11,15 @@ export const generateAccessToken = (user: { id: string; name?: string; isAdmin?:
 export const generateRefreshToken = (userId: string) => {
   return jwt.sign(
     { id: userId },
-    process.env.REFRESH_TOKEN_SECRET!,
+    process.env.JWT_SECRET_REFRESHTOKEN!,
     { expiresIn: "7d" } 
   );
 };
 
-export const generateEmailVerificationToken = (userId: string,IP : string,email:string) => {
+export const generateEmailVerificationToken = (userId: string,ip : string,email:string) => {
     return jwt.sign(
         {   id: userId,
-            IP : IP,
+            ip : ip,
             email : email
         },
         process.env.EMAIL_VERIFICATION_SECRET!,

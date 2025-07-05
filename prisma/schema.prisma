@@ -14,34 +14,43 @@ datasource db {
 }
 
 model User {
-  id                String            @id @default(uuid())
-  username          String            @unique
-  firstName         String
-  lastName          String
-  email             String            @unique
-  password          String
-  avatar            String?
-  verified          Boolean           @default(false)
-  verificationToken String?
-  emailExists       Boolean?           
-  interests         String[]          @default([])
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  followers         Follows[]         @relation("UserFollowers")
-  following         Follows[]         @relation("UserFollowing")
-  blogs             Blog[]            @relation("AuthorBlogs")
-  bookmarks         Bookmark[]
-  activity          UserActivity[]
-  recommendations   Recommendation[]
-  reach             UserReach?
-  viewedBlogs       ViewedBlog[]
-  likedBlogs        LikedBlog[]
-  sharedBlogs       SharedBlog[]
-  comments          Comment[]
-  customSections    CustomSection[]
-  trendingScore     Float             @default(0)
-  Notification      Notification[]
-  Progress          ReadingProgress[]
+  id                        String            @id @default(uuid())
+  username                  String            @unique
+  firstName                 String
+  lastName                  String
+  email                     String            @unique
+  password                  String
+  avatar                    String?
+  verified                  Boolean           @default(false)
+  emailStatus               EmailStatus       @default(PENDING)
+  emailError                Boolean           @default(false)
+  emailErrorMessage         String?
+  lastEmailSentAt           DateTime?
+  emailVerificationAttempts Int               @default(0)
+  interests                 String[]          @default([])
+  createdAt                 DateTime          @default(now())
+  updatedAt                 DateTime          @updatedAt
+  followers                 Follows[]         @relation("UserFollowers")
+  following                 Follows[]         @relation("UserFollowing")
+  blogs                     Blog[]            @relation("AuthorBlogs")
+  bookmarks                 Bookmark[]
+  activity                  UserActivity[]
+  recommendations           Recommendation[]
+  reach                     UserReach?
+  viewedBlogs               ViewedBlog[]
+  likedBlogs                LikedBlog[]
+  sharedBlogs               SharedBlog[]
+  comments                  Comment[]
+  customSections            CustomSection[]
+  trendingScore             Float             @default(0)
+  Notification              Notification[]
+  Progress                  ReadingProgress[]
+}
+
+enum EmailStatus {
+  PENDING
+  VERIFIED
+  INVALID
 }
 
 model Blog {

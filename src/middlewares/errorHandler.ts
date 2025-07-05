@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 
 export const globalErrorHandler = (
   err: any,
@@ -9,6 +9,8 @@ export const globalErrorHandler = (
 ) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
+  const code = err.code || null;
+  const data = err.data || null;
 
   console.log(
     chalk.bgRed.white.bold(" ERROR "),
@@ -18,12 +20,17 @@ export const globalErrorHandler = (
     "\n",
     chalk.bgMagenta.white.bold(` Message: `), chalk.magentaBright(message),
     "\n",
+    chalk.bgCyan.white.bold(` Code: `), chalk.cyan(code || "N/A"),
+    "\n",
     chalk.gray(err.stack)
   );
+
   res.status(statusCode).json({
     success: false,
     statusCode,
     message,
+    ...(code && { code }),
+    ...(data && { data }),
     ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
   });
 };

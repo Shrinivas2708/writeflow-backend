@@ -1,11 +1,8 @@
-import jwt ,{ JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { AppError } from "./AppError";
+import { DecodedUser } from "./exports";
 
-export interface DecodedUser extends JwtPayload {
-  id: string;
-  email?: string;
- 
-}
+
 export const verifyToken = (token : string , secret : string)=>{
     try {
         const decoded = jwt.verify(token,secret) as DecodedUser

@@ -9,6 +9,7 @@ import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/auth.routes";
 
 import chalk from "chalk";
+import { resendWebhookHandler } from "./controller/webhooks.controller";
 
 export const prisma = new PrismaClient();
 const app = express();
@@ -22,6 +23,8 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/v1/auth", authRoutes);
+app.post("/api/webhooks/resend", resendWebhookHandler);
+
 app.use(globalErrorHandler);
 
 app.listen(PORT, () => {

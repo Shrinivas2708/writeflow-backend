@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 
 import { AppError } from "../utils/AppError";
 import { verifyToken } from "../utils/verifyToken";
+import { logger } from "../utils/logger";
 
 export const verifyUser = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -13,7 +14,8 @@ export const verifyUser = (req: Request, res: Response, next: NextFunction) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = verifyToken(token, process.env.JWT_SECRET!);
+    logger.info("From the Access token!")
+    const decoded = verifyToken(token, process.env.JWT_SECRET_ACCESSTOKEN!);
 
     req.user = {
       id: decoded.id!,

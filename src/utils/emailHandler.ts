@@ -1,10 +1,13 @@
 import axios from "axios";
 import { AppError } from "./AppError";
-import { VerificationEmailTemplate } from "./constData";
+import { VerificationEmailTemplate } from "./exports";
 import { generateEmailVerificationToken } from "./generateToken";
 import { logger } from "./logger";
-import nodemailer, { createTransport } from "nodemailer";
-const ENV = process.env.NODE_ENV;
+import  { createTransport } from "nodemailer";
+import { Resend } from "resend";
+import {ENV} from "../utils/exports"
+const resend = new Resend(process.env.RESEND_API_KEY)
+
 
 const transport = createTransport({
   host: process.env.EMAIL_HOST,
@@ -20,27 +23,42 @@ export const sendEmailVerificationmail = async (
   userId: string,
   email: string
 ) => {
+  let html
+  let EmailToken
   try {
-    const token = generateEmailVerificationToken(userId, ip, email);
-    logger.info(`Verification Token for userId : ${userId} is ${token} `)
-    const html = VerificationEmailTemplate(token);
-    try {
-      if (ENV === "development") {
-        return await transport.sendMail({
-          from: "WriteFlow Developer Mode <no-reply@shriii.xyz",
+   EmailToken = generateEmailVerificationToken(userId, ip, email)
+    html = VerificationEmailTemplate(EmailToken,userId)
+    logger.info(EmailToken)
+  } catch (error) {
+    throw new AppError(501 , `Error while generating Email verification token + ${error}`)
+  }
+  try {
+    if (ENV === "development") {
+
+         await transport.sendMail({
+          from: "WriteFlow Developer Mode <no-reply@shriii.xyz>",
           to:email,
           subject: "Verify You Email ",
           html,
         });
+        return  EmailToken
       }
-    } catch (error : any) {
-      logger.error("Error while sending mail" + error.message)
-      throw new Error(error.message)
-     
-    }
-  } catch (error : any) {
-    logger.error("Error while generating email verification token mail "+ " " + error.message)
-    throw new Error(error.message)
-    
+      else{
+        const {data,error} = await resend.emails.send({
+          from: "WriteFlow  <no-reply@shriii.xyz>",
+          to: email,
+          subject: "Verify Your Email ",
+          html
+        })
+        
+        if(!data) {
+           throw new AppError(500,`Error while sending mail + ${error}`)
+           
+        }
+        logger.info("Mail sent!" + data.id)
+      }
+  } catch (error) {
+    throw new AppError(500,`Error while sending mail using nodemailer + ${error}`)
   }
+  
 };
