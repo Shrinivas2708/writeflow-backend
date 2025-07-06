@@ -22,42 +22,58 @@ export const checkemail = async (
   res: Response,
   next: NextFunction
 ) => {
-  const email = req.body.email.trim().toLowerCase();
+  const email = req.body.email?.trim().toLowerCase();
 
   try {
-    if (!MailChecker.isValid(email)) {
+    // 1. Basic format and disposable check
+    if (!email || !MailChecker.isValid(email)) {
        res.status(400).json({
         message: "Disposable or invalid email addresses are not allowed.",
       });
       return
     }
-    const user = await prisma.user.findFirst({
-      where: {
-        email,
-      },
-    });
+
+    // 2. Check if email already exists
+    const user = await prisma.user.findFirst({ where: { email } });
     if (user) {
-      res.status(409).json({
-        message: "Email already exist!",
+       res.status(409).json({
+        message: "Email already exists!",
       });
-      return;
+      return
     }
+
+    // 3. Abstract API check (fail-open mode)
     if (ENV !== "development") {
-      const Verification = await axios.get(
-        `https://emailvalidation.abstractapi.com/v1/?api_key=${process.env.EMAIL_VALIDATION_API}&email=${email}`
-      );
-      if (Verification.data.deliverability == "UNDELIVERABLE") {
-        res.status(409).json({
-          message: "Email doesn't exist!",
-        });
-        return;
+      try {
+        const { data: verification } = await axios.get(
+          `https://emailvalidation.abstractapi.com/v1/?api_key=${process.env.EMAIL_VALIDATION_API}&email=${email}`
+        );
+
+        if (verification.deliverability === "UNDELIVERABLE") {
+           res.status(400).json({
+            message: "Email doesn't exist or is undeliverable!",
+          });
+          return
+        }
+      } catch (apiError: any) {
+        console.warn(
+          "[Email Validation Warning]",
+          apiError.response?.status || "",
+          apiError.message
+        );
+        // 🟡 Skip failure, do NOT block user
       }
     }
-    res.status(200).json({
-      msg: "Email is valid and available!",
+
+    // 4. All checks passed or skipped
+     res.status(200).json({
+      message: "Email is valid and available!",
     });
+    return
   } catch (error: any) {
-    next(error instanceof AppError ? error : new AppError(500, error.message));
+     next(
+      error instanceof AppError ? error : new AppError(500, error.message)
+    );
   }
 };
 export const checkusername = async (
