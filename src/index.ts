@@ -4,11 +4,11 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { globalErrorHandler } from "./middlewares/errorHandler";
 import { PrismaClient } from "@prisma/client";
-import authRoutes from "./routes/auth.routes";
-
+import authRouter from "./routes/auth.routes";
 import chalk from "chalk";
 import { resendWebhookHandler } from "./controller/webhooks.controller";
 import { cleanupHandler } from "./controller/cleanup.controller";
+import blogRouter from "./routes/blogs.routes";
 
 export const prisma = new PrismaClient();
 const app = express();
@@ -27,7 +27,8 @@ app.get("/",(req,res)=>{
     message:"Welcome to WriteFlow APIs!"
   })
 })
-app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/blogs", blogRouter);
 app.post("/api/webhooks/resend", resendWebhookHandler);
 app.delete("/api/cron/cleanup",cleanupHandler)
 app.use(globalErrorHandler);

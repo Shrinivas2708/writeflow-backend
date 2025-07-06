@@ -106,6 +106,7 @@ export const signup = async (
 ) => {
   const { username, firstName, lastName, email, password } = req.body;
   const ip = req.ip!;
+  console.log(req.ip)
   try {
     const user = await prisma.user.create({
       data: {
@@ -189,7 +190,6 @@ export const verify = async (
   }
   const token = req.query.token as string;
   const userId = req.query.id as string
-
   try {
     const verifyCheck = await prisma.user.findUnique({
       where:{
@@ -203,7 +203,9 @@ export const verify = async (
       token,
       process.env.EMAIL_VERIFICATION_SECRET!
     ) as DecodedUser;
-    console.log(decoded);
+    console.log("Old ip: " + decoded.ip);
+    console.log("new ip: " + req.ip);
+    
     if (req.ip !== decoded.ip) {
       res.status(403).json({
         message: "IP mismatch! use the same browser you used to create account",
