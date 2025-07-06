@@ -1,6 +1,4 @@
-import { validateEnv } from "./utils/validateEnv";
 require("dotenv").config();
-// validateEnv();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";

@@ -26,9 +26,10 @@ export const checkemail = async (
 
   try {
     if (!MailChecker.isValid(email)) {
-      res.status(400).json({
+       res.status(400).json({
         message: "Disposable or invalid email addresses are not allowed.",
       });
+      return
     }
     const user = await prisma.user.findFirst({
       where: {
@@ -111,13 +112,12 @@ export const signup = async (
       },
     });
     ENV === "development"
-      ? res.status(200).json({ message: "Email Sent!", emailToken: emailToken, userId })
+      ? res.status(200).json({ message: "Email Sent!", emailToken: emailToken, userId , ip})
       : res.status(200).json({ message: "Email Sent!" });
   } catch (error: any) {
     next(error);
   }
 };
-
 export const login = async (
   req: Request,
   res: Response,
@@ -133,6 +133,7 @@ export const login = async (
         email,
       },
     });
+    if(!user) throw new AppError(401,"User doesnt exist!")
     if (user?.password != password) {
       throw new AppError(401, "Invalid Password!");
     }
@@ -163,14 +164,15 @@ export const verify = async (
   res: Response,
   next: NextFunction
 ) => {
+  
   if (!req.query.token ) {
     throw new AppError(400, "Invalid or missing token in query!");
   }
-  if ( !req.query.userid ) {
+  if ( !req.query.id ) {
     throw new AppError(400, "missing userid in query!");
   }
   const token = req.query.token as string;
-  const userId = req.query.userid as string
+  const userId = req.query.id as string
 
   try {
     const verifyCheck = await prisma.user.findUnique({
@@ -222,11 +224,7 @@ export const verify = async (
       next(new AppError(400, "Token not active yet!", "TOKEN_NOT_ACTIVE"));
     } else {
       next(
-        new AppError(
-          500,
-          "Something went wrong while verifying!",
-          "VERIFY_ERROR"
-        )
+        error
       );
     }
   }

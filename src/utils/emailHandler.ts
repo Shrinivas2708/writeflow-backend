@@ -9,14 +9,19 @@ import {ENV} from "../utils/exports"
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 
+// const transport = createTransport({
+//   host: process.env.EMAIL_HOST,
+//   port: 2525,
+//   auth: {
+//     user: process.env.EMAIL_AUTH_USER,
+//     pass: process.env.EMAIL_AUTH_PASS,
+//   },
+// });
 const transport = createTransport({
-  host: process.env.EMAIL_HOST,
-  port: 2525,
-  auth: {
-    user: process.env.EMAIL_AUTH_USER,
-    pass: process.env.EMAIL_AUTH_PASS,
-  },
-});
+    host: "localhost",
+    port: 1025,
+    ignoreTLS: true,
+  });
 export const sendEmailVerificationmail = async (
   
   ip: string,

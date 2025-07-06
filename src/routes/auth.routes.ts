@@ -4,7 +4,6 @@ import { signup, login, verify, passwordReset, deleteAccount,refreshToken,logout
 import { verifyUser } from "../middlewares/verifyUser";
 import { loginLimiter } from "../middlewares/loginratelimit";
 
-router.get("/refresh", refreshToken)
 router.get("/email-exist" , checkemail)
 router.get("/username-exist" , checkusername)
 router.post("/signup",  signup)
