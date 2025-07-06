@@ -21,6 +21,12 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+app.get("/",(req,res)=>{
+  res.status(200).json({
+    sucess:true,
+    message:"Welcome to WriteFlow APIs!"
+  })
+})
 app.use("/api/v1/auth", authRoutes);
 app.post("/api/webhooks/resend", resendWebhookHandler);
 app.delete("/api/cron/cleanup",cleanupHandler)
